@@ -326,18 +326,20 @@ def download(site, camera, picture_type):
 
             targetFile = os.path.join(dayDir, targetFilenameBase)
 
-            tmpDownloadTarget = os.path.join(TMPDIR, targetFilenameBase)
+            #tmpDownloadTarget = os.path.join(TMPDIR, targetFilenameBase)
             
 
-            print("tmpDownloadTarget: ", tmpDownloadTarget)
-            print("targetFile: ", targetFile)
+            #print("tmpDownloadTarget: ", tmpDownloadTarget)
+            #print("targetFile: ", targetFile)
             
 
             #sys.exit(1)
 
-            targetPathBase = os.path.join(cameraDir, picture_type)
+            #targetPathBase = os.path.join(cameraDir, picture_type)
             
-
+            if os.path.exists( targetFile ):
+                # skip download, we already have that file 
+                continue
 
             
             r = requests.get(sourceURL, stream=True)
