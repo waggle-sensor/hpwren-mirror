@@ -298,11 +298,11 @@ def download(site, camera, picture_type):
             orgFilename = picture["filename"]
             sourcePath =  picture["path"]
 
-            print("sourcePath: ", sourcePath)
+            #print("sourcePath: ", sourcePath)
 
             sourceURL = archive_url + sourcePath + orgFilename
 
-            print("sourceURL: ", sourceURL)
+            #print("sourceURL: ", sourceURL)
 
 
             targetFilenameBase = "{}{}{}-{}{}_{}".format(year, month, day, hour, minute, orgFilename)
@@ -341,7 +341,7 @@ def download(site, camera, picture_type):
                 # skip download, we already have that file 
                 continue
 
-            
+            print("writing ", targetFile)
             r = requests.get(sourceURL, stream=True)
             if r.status_code != 200:
                 print("got status_code: ", r.status_code )
