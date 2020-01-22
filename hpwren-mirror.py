@@ -132,8 +132,8 @@ def getQFolderContent(baseURL, subfolder, expected_timestamp_date):
 
         # verifiy date
         if expected_timestamp_date != date:
-            print("expected date and timestamp date do not match ({} vs {})".format(expected_timestamp_date, date))
-            sys.exit(1)
+            print("WARNING: expected date and timestamp date do not match ({} vs {})".format(expected_timestamp_date, date))
+            continue
        
         time_array = time.split(':')
         hour = int(time_array[0])
