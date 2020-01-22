@@ -402,7 +402,7 @@ if __name__ == "__main__":
         print("directory {} does not exist.".format(mirrorDir))
         sys.exit(1)
 
-    locations = {}
+    locations = []
 
     with open(config_file) as config_f:
         for line in config_f:
@@ -412,16 +412,23 @@ if __name__ == "__main__":
             line = line.split('#', 1)[0]
             line_array = line.split(',', 2)
             location = line_array[0].strip()
+            #print("location: ",  location)
             if location == "":
                 continue
             cameras = [x.strip() for x in  line_array[1].split(';')]
             description = line_array[2]
             #print(location, cameras)
-            locations[location] = { 'location' : location, 'cameras': cameras , 'description': description}
+            locations.append({ 'location' : location, 'cameras': cameras , 'description': description})
     
 
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(locations)
+    #pp = pprint.PrettyPrinter(indent=4)
+    #pp.pprint(locations)
 
+    for source in locations:
+        #print(source)
+        site = source['location']
+        for camera in source['cameras']:
+            print("download pictures on site {} from camera {} ...".format(site, camera))
+    
+            download(site=site, camera=camera, picture_type='c')
 
-    download(site='69bravo', camera='n', picture_type='c')
