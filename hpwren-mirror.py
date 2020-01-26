@@ -342,13 +342,13 @@ def download(site, camera, picture_type):
                 continue
 
             print("writing ", targetFile)
-            r = requests.get(sourceURL, stream=True)
-            if r.status_code != 200:
-                print("got status_code: ", r.status_code )
-                sys.exit(1)
-            with open(targetFile, 'wb') as f:
-                r.raw.decode_content = True
-                shutil.copyfileobj(r.raw, f)       
+            with requests.get(sourceURL, stream=True) as r:
+                if r.status_code != 200:
+                    print("got status_code: ", r.status_code )
+                    sys.exit(1)
+                with open(targetFile, 'wb') as f:
+                    r.raw.decode_content = True
+                    shutil.copyfileobj(r.raw, f)       
 
             os.chmod(targetFile, file_permisson) 
 
