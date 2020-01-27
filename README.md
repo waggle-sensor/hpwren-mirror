@@ -22,6 +22,12 @@ marconi    ,n       , Upper Talega
 Multiple cameras can be separated with semicolon: `n;s`
 
 
+## install dependecies
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
 ## Usage
 ```bash
 hpwren-mirror.py -c datasets.conf
