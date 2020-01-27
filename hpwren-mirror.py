@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import requests
 import shutil
+import datetime
+from pathlib import Path
 
 TMPDIR = '/var/tmp'
 
@@ -62,6 +64,7 @@ def getFolders(archiveURL, folder, subFolder):
             else:
                 folder["path"] = subFolder+folder_str
             folders.append(folder)
+           
 
 
     return folders
@@ -175,7 +178,7 @@ def getDayPictures(baseURL, pathURL, dayfolder, expected_timestamp_date):
 
     print("dayfolder: ", dayfolder)
    
-    #sys.exit(1)
+    
     qListingURL =  url + dayfolder['path']
     print("qListingURL: ", qListingURL)
 
@@ -227,7 +230,8 @@ def getDayPictures(baseURL, pathURL, dayfolder, expected_timestamp_date):
 def download(site, camera, picture_type):
 
     
-
+    today = datetime.datetime.today()
+    today_str = today.strftime("%Y%m%d")
 
     # exmaple: http://c1.hpwren.ucsd.edu/archive/69bravo-n-mobo-c/large/
     folder = '{}-{}-mobo-{}/large/'.format(site, camera, picture_type) 
@@ -268,31 +272,64 @@ def download(site, camera, picture_type):
 
     for dayfolder in dayFolders:
 
-        #print("dayfolder: ", dayfolder) 
-    
-        expected_timestamp_date = "{}-{}-{}".format(dayfolder["year"], dayfolder["month"], dayfolder["day"])
-        dayPictures = getDayPictures(archive_url, folder, dayfolder, expected_timestamp_date)
+        print("dayfolder: ", dayfolder) 
 
+        expected_timestamp_date = "{}-{}-{}".format(dayfolder["year"], dayfolder["month"], dayfolder["day"])
+
+
+
+        dayPictures = getDayPictures(archive_url, folder, dayfolder, expected_timestamp_date)
+       
         #print(dayPictures)
         if len(dayPictures) == 0:
             continue 
-
+        
         print("------")
-       
+        
         pp = pprint.PrettyPrinter(indent=4)
         pp.pprint(dayPictures)
-        
-       # sys.exit(1)
+    
+       
+        year = str(dayfolder["year"]) 
+        print("year: ", year)
+        month = dayfolder["month"]
+        day = dayfolder["day"]
 
-        
-      
+        yearDir = os.path.join(targetPathBase, year)
+        if not os.path.isdir(yearDir):
+            os.mkdir(yearDir)
+            os.chmod(yearDir, directory_permission)
+
+        monthDir = os.path.join(yearDir, month)
+        if not os.path.isdir(monthDir):
+            os.mkdir(monthDir)
+            os.chmod(monthDir, directory_permission)
+
+        dayDir = os.path.join(monthDir, day)
+        if not os.path.isdir(dayDir):
+            os.mkdir(dayDir)
+            os.chmod(dayDir, directory_permission)
+
+
+        # format: yyyymmdd
+        picture_date =  year + month + day
+        print("picture_date: \"{}\"".format(picture_date))
+
+        if today_str != picture_date:
+
+            # skip days that have been downloaded previously
+            completeFlag = os.path.join(dayDir, "complete.txt")
+            if os.path.exists( completeFlag ):
+                print("found complete.txt")
+                continue
+
+
+        #sys.exit(1)
 
         for picture in dayPictures:
        # outfileBase = '{}_{}_{}.zip'.format(sitename, year, month)
 
-            year = str(picture["year"])
-            month = "{:02d}".format(picture["month"])
-            day = "{:02d}".format(picture["day"])
+           
             hour = "{:02d}".format(picture["hour"])
             minute = "{:02d}".format(picture["minute"])
             orgFilename = picture["filename"]
@@ -306,22 +343,6 @@ def download(site, camera, picture_type):
 
 
             targetFilenameBase = "{}{}{}-{}{}_{}".format(year, month, day, hour, minute, orgFilename)
-
-
-            yearDir = os.path.join(targetPathBase, year)
-            if not os.path.isdir(yearDir):
-                os.mkdir(yearDir)
-                os.chmod(yearDir, directory_permission)
-
-            monthDir = os.path.join(yearDir, month)
-            if not os.path.isdir(monthDir):
-                os.mkdir(monthDir)
-                os.chmod(monthDir, directory_permission)
-
-            dayDir = os.path.join(monthDir, day)
-            if not os.path.isdir(dayDir):
-                os.mkdir(dayDir)
-                os.chmod(dayDir, directory_permission)
 
 
             targetFile = os.path.join(dayDir, targetFilenameBase)
@@ -352,7 +373,10 @@ def download(site, camera, picture_type):
 
             os.chmod(targetFile, file_permisson) 
 
-
+        # downloaded all pictures, set flag
+        Path(completeFlag).touch()
+        print("wrote flag: ", completeFlag)
+        
 
     return
 
